@@ -4,6 +4,7 @@ from random import randint, choice
 import cv2
 import cv2.aruco as aruco
 import numpy as np
+from connection import firebase
 
 COLOR_INACTIVE = pygame.Color('lightskyblue3')
 COLOR_ACTIVE = pygame.Color('dodgerblue2')
@@ -16,20 +17,19 @@ cap.set(3, 1280)
 cap.set(4, 720)
 detector = cv2.aruco.ArucoDetector(dictionary, parameters)
 
-player_walk_pic_1 = "/Users/ant/very new junk program/GEGE-Runner/graphics/Player/player_walk_1.png"
-player_walk_pic_2 = "/Users/ant/very new junk program/GEGE-Runner/graphics/Player/player_walk_2.png"
-player_jump_pic = "/Users/ant/very new junk program/GEGE-Runner/graphics/Player/jump.png"
-player_stand_pic = "/Users/ant/very new junk program/GEGE-Runner/graphics/Player/player_stand.png"
-jumpmp3 = "/Users/ant/very new junk program/GEGE-Runner/audio/jump.mp3"
-fly_pic_1 = "/Users/ant/very new junk program/GEGE-Runner/graphics/Fly/Fly1.png"
-fly_pic_2 = "/Users/ant/very new junk program/GEGE-Runner/graphics/Fly/Fly2.png"
-snail_pic_1 = "/Users/ant/very new junk program/GEGE-Runner/graphics/snail/snail1.png"
-snail_pic_2 = "/Users/ant/very new junk program/GEGE-Runner/graphics/snail/snail2.png"
-font_game = "/Users/ant/very new junk program/GEGE-Runner/font/Pixeltype.ttf"
-music_game = "/Users/ant/very new junk program/GEGE-Runner/audio/music.wav"
-ground_pic = "/Users/ant/very new junk program/GEGE-Runner/graphics/ground.png"
-sky_pic = "/Users/ant/very new junk program/GEGE-Runner/graphics/Sky.png"
-
+player_walk_pic_1 = "graphics/Player/player_walk_1.png"
+player_walk_pic_2 = "graphics/Player/player_walk_2.png"
+player_jump_pic = "graphics/Player/jump.png"
+player_stand_pic = "graphics/Player/player_stand.png"
+jumpmp3 = "audio/jump.mp3"
+fly_pic_1 = "graphics/Fly/Fly1.png"
+fly_pic_2 = "graphics/Fly/Fly2.png" 
+snail_pic_1 = "graphics/snail/snail1.png"
+snail_pic_2 = "graphics/snail/snail2.png"
+font_game = "font/Pixeltype.ttf"
+music_game = "audio/music.wav"
+ground_pic = "graphics/ground.png"
+sky_pic = "graphics/Sky.png"
 
 
 class Player(pygame.sprite.Sprite):
@@ -195,6 +195,7 @@ class InputBox:
 
 
 pygame.init()
+isUpdate = True
 screen = pygame.display.set_mode((800,400))
 pygame.display.set_caption('GEGE Runner')
 clock = pygame.time.Clock()
@@ -310,8 +311,8 @@ while True:
 				else: fly_frame_index = 0
 				fly_surf = fly_frames[fly_frame_index] 
 
-
 	if game_active:
+		isUpdate = True
 		screen.blit(sky_surface,(0,0))
 		screen.blit(ground_surface,(0,300))
 		# pygame.draw.rect(screen,'#c0e8ec',score_rect)
@@ -388,6 +389,14 @@ while True:
 		screen.blit(game_name,game_name_rect)
 
 		if score == 0: screen.blit(game_message,game_message_rect)
-		else: screen.blit(score_message,score_message_rect)
+		else:
+			screen.blit(score_message,score_message_rect)
+			if isUpdate:
+				# Update played time
+				path = f'users_score/{input_box1.text}.json'.replace(' ','')
+				firebase.update_played(path)
+				# print(path)
+				isUpdate = False
+				
 	pygame.display.update()
 	clock.tick(60)
