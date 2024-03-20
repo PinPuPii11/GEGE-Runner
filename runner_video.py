@@ -5,6 +5,10 @@ import cv2
 import cv2.aruco as aruco
 import numpy as np
 
+COLOR_INACTIVE = pygame.Color('lightskyblue3')
+COLOR_ACTIVE = pygame.Color('dodgerblue2')
+
+
 dictionary = aruco.getPredefinedDictionary(aruco.DICT_4X4_250)
 parameters = aruco.DetectorParameters()
 cap = cv2.VideoCapture(0)
@@ -25,6 +29,8 @@ font_game = "/Users/ant/very new junk program/GEGE-Runner/font/Pixeltype.ttf"
 music_game = "/Users/ant/very new junk program/GEGE-Runner/audio/music.wav"
 ground_pic = "/Users/ant/very new junk program/GEGE-Runner/graphics/ground.png"
 sky_pic = "/Users/ant/very new junk program/GEGE-Runner/graphics/Sky.png"
+
+
 
 class Player(pygame.sprite.Sprite):
 	def __init__(self):
@@ -144,6 +150,49 @@ def player_animation():
 		player_index += 0.1
 		if player_index >= len(player_walk):player_index = 0
 		player_surf = player_walk[int(player_index)]
+class InputBox:
+
+    def __init__(self, x, y, w, h, text=''):
+        self.rect = pygame.Rect(x, y, w, h)
+        self.color = COLOR_INACTIVE
+        self.text = text
+        self.txt_surface = test_font.render(text, True, self.color)
+        self.active = False
+
+    def handle_event(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            # If the user clicked on the input_box rect.
+            if self.rect.collidepoint(event.pos):
+                # Toggle the active variable.
+                self.active = not self.active
+            else:
+                self.active = False
+            # Change the current color of the input box.
+            self.color = COLOR_ACTIVE if self.active else COLOR_INACTIVE
+        if event.type == pygame.KEYDOWN:
+            if self.active:
+                if event.key == pygame.K_RETURN:
+                    print(self.text)
+                    self.text = ''
+                elif event.key == pygame.K_BACKSPACE:
+                    self.text = self.text[:-1]
+                else:
+                    self.text += event.unicode
+                # Re-render the text.
+                self.txt_surface = test_font.render(self.text, True, self.color)
+
+    def update(self):
+        # Resize the box if the text is too long.
+        width = max(200, self.txt_surface.get_width()+10)
+        self.rect.w = width
+
+    def draw(self, screen):
+        # Blit the text.
+        screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
+        # Blit the rect.
+        pygame.draw.rect(screen, self.color, self.rect, 2)
+
+
 
 pygame.init()
 screen = pygame.display.set_mode((800,400))
@@ -155,6 +204,7 @@ start_time = 0
 score = 0
 bg_music = pygame.mixer.Sound(music_game)
 bg_music.play(loops = -1)
+input_box1 = InputBox(400-100, 100-10, 140, 30)
 
 #Groups
 player = pygame.sprite.GroupSingle()
@@ -217,12 +267,15 @@ fly_animation_timer = pygame.USEREVENT + 3
 pygame.time.set_timer(fly_animation_timer,200)
 resetjump = True
 player_y = 99999
+
+
 while True:
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			pygame.quit()
 			exit()
-		
+		input_box1.handle_event(event)
+		input_box1.update()
 		if game_active:
 			if event.type == pygame.MOUSEBUTTONDOWN:
 				if player_rect.collidepoint(event.pos) and player_rect.bottom >= 300: 
@@ -232,10 +285,12 @@ while True:
 				if event.key == pygame.K_SPACE and player_rect.bottom >= 300:
 					player_gravity = -20
 		else:
+			
 			if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
 				game_active = True
 				
 				start_time = int(pygame.time.get_ticks() / 1000)
+				
 
 		if game_active:
 			if event.type == obstacle_timer:
@@ -318,12 +373,21 @@ while True:
 		player_rect.midbottom = (80,300)
 		player_gravity = 0
 
+		score_surf = test_font.render('Enter name: ',False,(64,64,64))
+		score_rect = score_surf.get_rect(center = (210,107))
+		screen.blit(score_surf,score_rect)
+
+		input_box1.draw(screen)
+
+		name_surf = test_font.render(f'Name: {input_box1.text}',False,(64,64,64))
+		name_rect = name_surf.get_rect(center = (400,50))
+		screen.blit(name_surf,name_rect)
+	
 		score_message = test_font.render(f'Your score: {score}',False,(111,196,169))
 		score_message_rect = score_message.get_rect(center = (400,330))
 		screen.blit(game_name,game_name_rect)
 
 		if score == 0: screen.blit(game_message,game_message_rect)
 		else: screen.blit(score_message,score_message_rect)
-
 	pygame.display.update()
 	clock.tick(60)
