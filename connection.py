@@ -10,7 +10,8 @@ class Connection():
         if response.status_code == 200:
             data = response.json()
             print("Data from Firebase:")
-            print(data)
+            # print(data)
+            return data
         else:
             print("Error:", response.text)
     # POST
@@ -50,7 +51,20 @@ class Connection():
                     print("Error updating played_time:", response.text)
         else:
             print("Error:", response.text)
-        
+    # Update highest score
+    def update_highest_score(self, path, score):
+        response = requests.get(self.firebase_url + path)
+        if response.status_code == 200:
+            data = response.json()
+            if 'score' in data:
+                if data['score'] < score:
+                    response = requests.patch(self.firebase_url + path, json=data)
+                    if response.status_code == 200:
+                        print("Played updated successfully", data['played_time'])
+                    else:
+                        print("Error updating played_time:", response.text)
+        else:
+            print("Error:", response.text)
 
 firebase = Connection()
 

@@ -392,10 +392,22 @@ while True:
 		else:
 			screen.blit(score_message,score_message_rect)
 			if isUpdate:
-				# Update played time
-				path = f'users_score/{input_box1.text}.json'.replace(' ','')
-				firebase.update_played(path)
-				# print(path)
+				# Check user_info from firebase
+				player_name = input_box1.text.replace(' ','')
+				path = f'users_score/{player_name}.json'
+				firebase_user = firebase.get_data(path)
+				if firebase_user: # If user is existed
+					# Update played time
+					firebase.update_played(path)
+					firebase.update_highest_score(path)
+				else: # If user play at the first times
+					data = {
+						'name': player_name,
+						'played_time': 1,
+						'tel': '',
+						'highest_score': score
+					}
+					firebase.update_data(path, data)
 				isUpdate = False
 				
 	pygame.display.update()
