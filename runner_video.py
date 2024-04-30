@@ -4,6 +4,8 @@ from random import randint, choice
 import cv2
 import cv2.aruco as aruco
 import numpy as np
+from components.player import Player
+from components.obstacle import Obstacle
 from connection import firebase
 
 COLOR_INACTIVE = pygame.Color('lightskyblue3')
@@ -32,83 +34,6 @@ ground_pic = "graphics/ground.png"
 sky_pic = "graphics/Sky.png"
 
 
-class Player(pygame.sprite.Sprite):
-	def __init__(self):
-		super().__init__()
-		player_walk_1 = pygame.image.load(player_walk_pic_1).convert_alpha()
-		player_walk_2 = pygame.image.load(player_walk_pic_2).convert_alpha()
-		self.player_walk = [player_walk_1,player_walk_2]
-		self.player_index = 0
-		self.player_jump = pygame.image.load(player_jump_pic).convert_alpha()
-
-		self.image = self.player_walk[self.player_index]
-		self.rect = self.image.get_rect(midbottom = (80,300))
-		self.gravity = 0
-
-		self.jump_sound = pygame.mixer.Sound(jumpmp3)
-		self.jump_sound.set_volume(0.5)
-
-	def player_input(self,y,rj):
-		
-		# keys = pygame.key.get_pressed()
-		print(y,rj)
-		if y < 200 and rj == True and self.rect.bottom == 300:
-			self.gravity = -20
-			self.jump_sound.play()
-
-	def apply_gravity(self):
-		self.gravity += 1
-		self.rect.y += self.gravity
-		if self.rect.bottom >= 300:
-			self.rect.bottom = 300
-
-	def animation_state(self):
-		if self.rect.bottom < 300: 
-			self.image = self.player_jump
-		else:
-			self.player_index += 0.1
-			if self.player_index >= len(self.player_walk):self.player_index = 0
-			self.image = self.player_walk[int(self.player_index)]
-
-	def update(self,y,rj):
-		self.player_input(y,rj)
-		self.apply_gravity()
-		self.animation_state()
-
-class Obstacle(pygame.sprite.Sprite):
-	def __init__(self,type):
-		super().__init__()
-		
-		if type == 'fly':
-			fly_1 = pygame.image.load(fly_pic_1).convert_alpha()
-			fly_2 = pygame.image.load(fly_pic_2).convert_alpha()
-			self.frames = [fly_1,fly_2]
-			y_pos = 210
-		else:
-			snail_1 = pygame.image.load(snail_pic_1).convert_alpha()
-			snail_2 = pygame.image.load(snail_pic_2).convert_alpha()
-			self.frames = [snail_1,snail_2]
-			y_pos  = 300
-
-		self.animation_index = 0
-		self.image = self.frames[self.animation_index]
-		self.rect = self.image.get_rect(midbottom = (randint(900,1100),y_pos))
-
-	def animation_state(self):
-		self.animation_index += 0.1 
-		if self.animation_index >= len(self.frames): self.animation_index = 0
-		self.image = self.frames[int(self.animation_index)]
-
-	def update(self):
-		self.animation_state()
-		self.rect.x -= 6
-		self.destroy()
-
-	def destroy(self):
-		if self.rect.x <= -100: 
-			self.kill()
-
-
 def display_score():
 	current_time = int(pygame.time.get_ticks() / 1000) - start_time
 	score_surf = test_font.render(f'Score: {current_time}',False,(64,64,64))
@@ -116,24 +41,24 @@ def display_score():
 	screen.blit(score_surf,score_rect)
 	return current_time
 
-def obstacle_movement(obstacle_list):
-	if obstacle_list:
-		for obstacle_rect in obstacle_list:
-			obstacle_rect.x -= 5
+# def obstacle_movement(obstacle_list):
+# 	if obstacle_list:
+# 		for obstacle_rect in obstacle_list:
+# 			obstacle_rect.x -= 5
 
-			if obstacle_rect.bottom == 300: screen.blit(snail_surf,obstacle_rect)
-			else: screen.blit(fly_surf,obstacle_rect)
+# 			if obstacle_rect.bottom == 300: screen.blit(snail_surf,obstacle_rect)
+# 			else: screen.blit(fly_surf,obstacle_rect)
 
-		obstacle_list = [obstacle for obstacle in obstacle_list if obstacle.x > -100]
+# 		obstacle_list = [obstacle for obstacle in obstacle_list if obstacle.x > -100]
 
-		return obstacle_list
-	else: return []
+# 		return obstacle_list
+# 	else: return []
 
-def collisions(player,obstacles):
-	if obstacles:
-		for obstacle_rect in obstacles:
-			if player.colliderect(obstacle_rect): return False
-	return True
+# def collisions(player,obstacles):
+# 	if obstacles:
+# 		for obstacle_rect in obstacles:
+# 			if player.colliderect(obstacle_rect): return False
+# 	return True
 
 def collision_sprite():
 	if pygame.sprite.spritecollide(player.sprite,obstacle_group,False):
@@ -141,15 +66,15 @@ def collision_sprite():
 		return False
 	else: return True
 
-def player_animation():
-	global player_surf, player_index
+# def player_animation():
+# 	global player_surf, player_index
 
-	if player_rect.bottom < 300:
-		player_surf = player_jump
-	else:
-		player_index += 0.1
-		if player_index >= len(player_walk):player_index = 0
-		player_surf = player_walk[int(player_index)]
+# 	if player_rect.bottom < 300:
+# 		player_surf = player_jump
+# 	else:
+# 		player_index += 0.1
+# 		if player_index >= len(player_walk):player_index = 0
+# 		player_surf = player_walk[int(player_index)]
 class InputBox:
 
     def __init__(self, x, y, w, h, text=''):
@@ -180,7 +105,7 @@ class InputBox:
                     self.text += event.unicode
                 # Re-render the text.
                 self.txt_surface = test_font.render(self.text, True, self.color)
-
+    
     def update(self):
         # Resize the box if the text is too long.
         width = max(200, self.txt_surface.get_width()+10)
@@ -191,8 +116,6 @@ class InputBox:
         screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
         # Blit the rect.
         pygame.draw.rect(screen, self.color, self.rect, 2)
-
-
 
 pygame.init()
 isUpdate = True
@@ -399,7 +322,7 @@ while True:
 				if firebase_user: # If user is existed
 					# Update played time
 					firebase.update_played(path)
-					firebase.update_highest_score(path)
+					firebase.update_highest_score(path, score)
 				else: # If user play at the first times
 					data = {
 						'name': player_name,
