@@ -12,9 +12,10 @@ class Player(pygame.sprite.Sprite):
 		self.jump_sound = pygame.mixer.Sound('./audio/jump.mp3')
 		self.jump_sound.set_volume(0.5)
 
-	def player_input(self):
-		keys = pygame.key.get_pressed()
-		if keys[pygame.K_SPACE] and self.rect.bottom >= 300:
+	def player_input(self,y,rj):
+		# keys = pygame.key.get_pressed()
+		print(y,rj)
+		if y < 200 and rj == True and self.rect.bottom == 300:
 			self.gravity = -20
 			self.jump_sound.play()
 
@@ -32,8 +33,8 @@ class Player(pygame.sprite.Sprite):
 			if self.player_index >= len(self.player_walk):self.player_index = 0
 			self.image = self.player_walk[int(self.player_index)]
 
-	def update(self):
-		self.player_input()
+	def update(self,y,rj):
+		self.player_input(y,rj)
 		self.apply_gravity()
 		self.animation_state()
 

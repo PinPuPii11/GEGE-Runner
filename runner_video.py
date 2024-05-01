@@ -11,7 +11,7 @@ from connection import firebase
 COLOR_INACTIVE = pygame.Color('lightskyblue3')
 COLOR_ACTIVE = pygame.Color('dodgerblue2')
 
-
+ 
 dictionary = aruco.getPredefinedDictionary(aruco.DICT_4X4_250)
 parameters = aruco.DetectorParameters()
 cap = cv2.VideoCapture(0)

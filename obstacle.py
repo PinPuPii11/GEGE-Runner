@@ -27,7 +27,7 @@ class Obstacle(pygame.sprite.Sprite):
 
 	def update(self):
 		self.animation_state()
-		self.rect.x -= 6
+		self.rect.x -= 5
 		self.destroy()
 
 	def destroy(self):
