@@ -1,5 +1,6 @@
 import pygame
 import sys
+from button import Button
 
 class DifficultyMenu:
     def __init__(self):
@@ -18,20 +19,27 @@ class DifficultyMenu:
 
         self.selected_option = "Normal"  # Start with Normal
 
-    def draw_text(self, text, color, x, y):
+    def draw(self, text, color, x, y):
         text_surface = self.font.render(text, True, color)
         text_rect = text_surface.get_rect()
         text_rect.center = (x, y)
         self.screen.blit(text_surface, text_rect)
 
+    def load_buttons(self):
+        self.easy_img = pygame.image.load('./easy.png').convert_alpha()
+        self.nor_img = pygame.image.load('./normal.png').convert_alpha()
+        self.chal_img = pygame.image.load('./chal.png').convert_alpha()
+        self.easy_button = Button(self.screen_width // 2, 250,self.easy_img,0.5)
+        self.normal_button = Button(self.screen_width // 2, 300,self.nor_img,0.5)
+        self.challenge_buttom = Button(self.screen_width // 2, 350,self.chal_img,0.5)
     def run(self):
         while True:
             self.screen.fill(self.WHITE)
-            self.draw_text("Choose your difficulty...", self.BLACK, self.screen_width // 2, 100)
-            self.draw_text("Easy", self.BLACK, self.screen_width // 2, 250)
-            self.draw_text("Normal", self.BLACK, self.screen_width // 2, 300)
-            self.draw_text("Hard", self.BLACK, self.screen_width // 2, 350)
-            self.draw_text("->", self.BLACK, self.screen_width // 2 - 100, 250 + (50 * ["Easy", "Normal", "Hard"].index(self.selected_option)))
+            self.draw("Choose your difficulty...", self.BLACK, self.screen_width // 2, 100)
+            self.draw("Easy", self.BLACK, self.screen_width // 2, 250)
+            self.draw("Normal", self.BLACK, self.screen_width // 2, 300)
+            self.draw("Hard", self.BLACK, self.screen_width // 2, 350)
+            self.draw("->", self.BLACK, self.screen_width // 2 - 100, 250 + (50 * ["Easy", "Normal", "Hard"].index(self.selected_option)))
             pygame.display.update()
 
             for event in pygame.event.get():
@@ -56,7 +64,7 @@ class DifficultyMenu:
                         # print("คุณเลือกระดับความยาก:", self.selected_option)
                         return self.selected_option
 
-if __name__ == "__main__":
-    menu = DifficultyMenu()
-    selected_difficulty = menu.run()
-    print("คุณเลือกระดับความยาก:", selected_difficulty)
+# if __name__ == "__main__":
+#     menu = DifficultyMenu()
+#     selected_difficulty = menu.run()
+#     print("คุณเลือกระดับความยาก:", selected_difficulty)
