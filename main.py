@@ -3,6 +3,7 @@ from sys import exit
 from random import choice
 from player import Player
 from obstacle import Obstacle
+from difficulties import DifficultyMenu
 
 class Game:
     def __init__(self) -> None:
@@ -12,16 +13,20 @@ class Game:
         self.clock = pygame.time.Clock()
         self.running = True
         self.test_font = pygame.font.Font('./font/Pixeltype.ttf', 50)
-        self.game_active = True
+        self.game_active = False
         self.start_time = 0
         self.score = 0
         self.play_music()
         self.set_player()
         self.obstacle_group = pygame.sprite.Group()
         self.set_background()
+        # Difficulty Menu at first time
+        self.difficulty_menu = DifficultyMenu()
+        self.difficulty_menu.run()
         self.set_intro_screen()
         self.obstacle_timer = pygame.USEREVENT + 1
         pygame.time.set_timer(self.obstacle_timer,1500)
+        self.run()
 
     def play_music(self):
         self.bg_music = pygame.mixer.Sound('./audio/music.wav')
@@ -59,13 +64,20 @@ class Game:
             self.obstacle_group.empty()
             return False
         else: return True
-
+    
     def run(self):
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     exit()
+                # if self.game_active:
+                #     if event.type == self.obstacle_timer:
+                #         self.obstacle_group.add(Obstacle(choice(['fly','snail','snail','snail'])))
+                # else:
+                #     if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                #         self.game_active = True
+                #         self.start_time = int(pygame.time.get_ticks() / 1000)
                 if event.type == self.obstacle_timer and self.game_active:
                     self.obstacle_group.add(Obstacle(choice(['fly','snail','snail','snail'])))
                 if not self.game_active and event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
@@ -78,7 +90,7 @@ class Game:
                 self.screen.blit(self.sky_surface,(0,0))
                 self.screen.blit(self.ground_surface,(0,300))
                 self.score = self.display_score()
-                # Play
+                # Player
                 self.player.draw(self.screen)
                 self.player.update()
                 # Obstacles
@@ -101,4 +113,4 @@ class Game:
             self.clock.tick(60)
 
 game = Game()
-game.run()
+# game.run()
