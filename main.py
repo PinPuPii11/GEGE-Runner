@@ -25,13 +25,16 @@ class Game:
         self.clock = pygame.time.Clock()
         self.running = True
         self.test_font = pygame.font.Font('./font/Pixeltype.ttf', 50)
-        self.game_active = True
+        self.game_active = False
         self.start_time = 0
         self.score = 0
         self.play_music()
         self.set_player()
         self.obstacle_group = pygame.sprite.Group()
         self.set_background()
+        # Difficulty Menu at first time
+        # self.difficulty_menu = DifficultyMenu()
+        # self.difficulty_menu.run()
         self.set_intro_screen()
         self.obstacle_timer = pygame.USEREVENT + 1
         self.box = InputBox(400-100, 100-10, 140, 30)
@@ -84,7 +87,7 @@ class Game:
             self.obstacle_group.empty()
             return False
         else: return True
-
+    
     def run(self):
         while self.running:
             
