@@ -17,16 +17,16 @@ Requirements:
 - opencv-contrib-python (for ArUco detection)
 
 Installation:
-1. Clone this repository to your local machine.
-   ```git clone https://github.com/PinPuPii11/GEGE-Runner.git```
+1. Clone this repository to your local machine.  
+   `git clone https://github.com/PinPuPii11/GEGE-Runner.git`
 
-2. Navigate to the project directory.
-   ```cd /path/to/GEGE-Runner```
+2. Navigate to the project directory.  
+   `cd /path/to/GEGE-Runner`
 
 Usage:
 
-1. Launch the game by running the Python script.
-   ```python main.py```
+1. Launch the game by running the Python script.  
+   `python main.py`
 2. Aim your camera at an ArUco marker(QR Code) to control the Character:
     - Jump: Show the Jump ArUco marker (e.g., ID 0).
     - Duck: Show the Duck ArUco marker (e.g., ID 1).
